@@ -1,0 +1,26 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - SA_PASSWORD=DevADIFieldPassword123
+      - ACCEPT_EULA=Y
+    ports:
+      - 1455:1433
+    volumes:
+      - sqlserverdata:/var/lib/sqlserver/data
+  adi-field:
+    image: ryukote/adi-field:dev
+    container_name: adi-field-dev
+    build:
+      context: .
+      dockerfile: ./api/WebAPI/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=localhost, 1455;Database=ADIField;User Id=sa;Password=DevADIFieldPassword123;
+    ports:
+      - 80:80
+    depends_on:
+      - sqlserver
+volumes:
+  sqlserverdata:
