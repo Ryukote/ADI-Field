@@ -12,5 +12,5 @@ public class User : BaseAuditableEntity
     public bool IsUsingWhatsapp { get; set; }
     public bool IsUsingDiscord { get; set; }
     public string DiscordName { get; set; }
-    public int MyProperty { get; set; }
+    public string Auth0Id { get; set; }
 }

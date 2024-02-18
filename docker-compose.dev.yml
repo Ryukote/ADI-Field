@@ -8,6 +8,50 @@ services:
       - 1455:1433
     volumes:
       - sqlserverdata:/var/lib/sqlserver/data
+    networks:
+      - dev
+  keycloak-db:
+    container_name: adi-keycloak-dev-db
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=DevKeycloakPassword123
+    ports:
+      - 5433:5432
+    volumes:
+      - keycloakdbdata:/var/lib/keycloak_db/data
+    networks:
+      - dev
+  iam-panel:
+    container_name: adi-field-iam-panel-dev
+    image: dpage/pgadmin4:latest
+    restart: always
+    ports:
+      - "85:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=neki@email.hr
+      - PGADMIN_DEFAULT_PASSWORD=AdiFieldDevPgAdminPassword123
+    volumes:
+      - pgadmindata:/var/lib/pgadmin
+    networks:
+      - dev
+  keycloak:
+    container_name: adi-keycloak-dev
+    image: jboss/keycloak:latest
+    environment:
+      - KC_DB_URL=jdbc:postgresql://adi-keycloak-dev-db:5433/keycloak
+      - KC_DB_PASSWORD=DevKeycloakPassword123
+      - KC_DB_USER=keycloak
+      - KC_HEALTH_ENABLED='true'
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak-db
+    networks:
+      - dev
   adi-field:
     image: ryukote/adi-field:dev
     container_name: adi-field-dev
@@ -22,5 +66,13 @@ services:
       - 80:80
     depends_on:
       - sqlserver
+    networks:
+      - dev
+networks:
+  dev:
+    name: adi-field-dev
+    driver: bridge
 volumes:
   sqlserverdata:
+  keycloakdbdata:
+  pgadmindata:
